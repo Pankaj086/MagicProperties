@@ -17,7 +17,7 @@ connectCloudinary();
 
 // middleware
 const corsOptions = {
-  origin: ["http://localhost:5173", "https://magic-properties-7psv.vercel.app/"], // Allow your frontend domain and others
+  origin: ["http://localhost:5173", "https://magic-properties-7psv.vercel.app"], // Allow your frontend domain and others
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true, // Enable cookies in requests and responses
