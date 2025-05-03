@@ -5,6 +5,7 @@ import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import userRoutes from './routes/userRoutes.js';
 import propertyRoutes from './routes/propertyRoutes.js';
+import cookieParser from "cookie-parser";
 // import path from 'path';
 // import { fileURLToPath } from 'url';
 
