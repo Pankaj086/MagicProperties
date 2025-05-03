@@ -143,34 +143,52 @@ const uploadPropertyImage = async (req, res) => {
     
     console.log('File received:', req.file);
     
-    if (!fs.existsSync(req.file.path)) {
-      return res.status(400).json({ message: 'File does not exist at the specified path' });
-    }
-    
-    const stats = fs.statSync(req.file.path);
-    console.log('File size:', stats.size, 'bytes');
+    // Check if we're in production mode (using memoryStorage)
+    const isProduction = process.env.NODE_ENV === 'production';
     
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
       console.error('Cloudinary configuration missing');
       return res.status(500).json({ message: 'Server configuration error: Cloudinary not properly configured' });
     }
     
-    //  Cloudinaryupload  error handling
+    // Cloudinary upload error handling
     console.log('Attempting to upload to Cloudinary...');
     try {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'property_images',
-        resource_type: 'auto'
-      });
+      let result;
+      
+      if (isProduction) {
+        // Upload directly from buffer in production
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+        
+        result = await cloudinary.uploader.upload(dataURI, {
+          folder: 'property_images',
+          resource_type: 'auto'
+        });
+      } else {
+        // In development, upload from disk file path
+        if (!fs.existsSync(req.file.path)) {
+          return res.status(400).json({ message: 'File does not exist at the specified path' });
+        }
+        
+        const stats = fs.statSync(req.file.path);
+        console.log('File size:', stats.size, 'bytes');
+        
+        result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'property_images',
+          resource_type: 'auto'
+        });
+        
+        // Clean up local file in development
+        try {
+          console.log('Removing temporary file:', req.file.path);
+          fs.unlinkSync(req.file.path);
+        } catch (unlinkError) {
+          console.error('Error removing temporary file:', unlinkError);
+        }
+      }
       
       console.log('Cloudinary upload success:', result.secure_url);
-      
-      try {
-        console.log('Removing temporary file:', req.file.path);
-        fs.unlinkSync(req.file.path);
-      } catch (unlinkError) {
-        console.error('Error removing temporary file:', unlinkError);
-      }
       
       if (!result || !result.secure_url) {
         return res.status(500).json({ message: 'Failed to retrieve URL from Cloudinary' });
@@ -187,7 +205,8 @@ const uploadPropertyImage = async (req, res) => {
   } catch (error) {
     console.error('Image upload error:', error);
 
-    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+    // Clean up temp file if it exists in development
+    if (!isProduction && req.file && req.file.path && fs.existsSync(req.file.path)) {
       try {
         console.log('Cleaning up file after error:', req.file.path);
         fs.unlinkSync(req.file.path);
