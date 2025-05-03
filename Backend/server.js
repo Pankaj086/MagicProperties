@@ -14,13 +14,17 @@ const port = process.env.PORT || 5000;
 connectDB();
 connectCloudinary();
 
-// Get __dirname equivalent in ES module
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
 // middleware
-app.use(express.json());
-app.use(cors());
+const corsOptions = {
+  origin: ["http://localhost:5173", ""], // Allow your frontend domain and others
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // Enable cookies in requests and responses
+};
+app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.json()); // Parse JSON requests
 // app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 // api endpoints
