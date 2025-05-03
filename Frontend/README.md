@@ -1,4 +1,4 @@
-# HackOClock Internship Frontend
+# Internship 
 
 This repository contains the frontend application for the HackOClock Internship project. It's built with React and Vite to provide a modern, fast development experience.
 
