@@ -18,7 +18,7 @@ const router = express.Router();
 // Get __dirname equivalent in ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const uploadsDir = path.join(__dirname, '../tmp');
+const uploadsDir = path.join(__dirname, '../uploads');
 
 // Ensure uploads directory exists
 if (!fs.existsSync(uploadsDir)) {

@@ -22,11 +22,24 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true, // Enable cookies in requests and responses
 };
+
+// Get __dirname equivalent in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Create uploads folder if it doesn't exist
+import fs from 'fs';
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  console.log('Creating uploads directory at:', uploadsDir);
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.json()); // Parse JSON requests
-// app.use('/uploads', express.static(path.join(__dirname, '/tmp')));
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 // api endpoints
 app.get('/', (req, res) => res.status(200).send('API is running'));
