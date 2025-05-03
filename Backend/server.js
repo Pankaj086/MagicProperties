@@ -26,7 +26,7 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.json()); // Parse JSON requests
-// app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, '/tmp')));
 
 // api endpoints
 app.get('/', (req, res) => res.status(200).send('API is running'));
